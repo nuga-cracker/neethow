@@ -26,3 +26,7 @@
 - `sw.js`, `manifest.webmanifest`, `icon-*.png`, `apple-touch-icon.png`, `favicon.svg` : 오프라인·홈 화면 추가·아이콘
 - `og.png` : 링크 공유 미리보기 이미지
 
+
+## 가이드북
+- `guide/` 폴더에 가이드북 PDF 46쪽을 이미지(webp)로 넣어두었습니다. 메인 카드/상단 "가이드북" 메뉴로 열립니다.
+- 주소: `#/guide`, 특정 쪽은 `#/guide/31` 처럼 이동.
