@@ -225,10 +225,32 @@
   .guide-parts{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }
   .guide-parts button{ font:inherit; font-size:0.85rem; font-weight:700; padding:7px 13px; border-radius:999px; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; }
   .guide-parts button:hover{ border-color:var(--green-strong); color:var(--green-deep); }
-  .guide-pages{ display:flex; flex-direction:column; gap:14px; align-items:center; margin-bottom:28px; }
-  .guide-page{ width:100%; max-width:560px; margin:0; scroll-margin-top:70px; }
-  .guide-page img{ display:block; width:100%; height:auto; aspect-ratio:720/1480; border:1px solid var(--line); border-radius:8px; background:var(--paper-muted); }
-  .guide-page figcaption{ font-size:0.75rem; color:var(--ink-soft); text-align:right; margin-top:4px; }
+  @media (max-width:859px){ .guide-parts{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; } .guide-parts button{ flex:none; white-space:nowrap; } }
+  .guide-parts button.active{ background:var(--green-soft); border-color:var(--green-strong); color:var(--green-deep); }
+  .guide-book{ display:flex; justify-content:center; align-items:flex-start; gap:0; margin:0 auto 8px; touch-action:pan-y; scroll-margin-top:8px; }
+  .book-page{ margin:0; flex:none; width:100%; max-width:440px; }
+  .book-page img{ display:block; width:100%; height:auto; aspect-ratio:720/1480; border:1px solid var(--line); border-radius:6px; background:var(--paper-muted); }
+  .book-slot{ display:none; }
+  .guide-book.flip-next .book-page, .guide-book.flip-prev .book-page{ animation:pgIn .22s ease-out; }
+  .guide-book.flip-prev .book-page{ --dx:-14px; }
+  .guide-book.flip-next .book-page{ --dx:14px; }
+  @keyframes pgIn{ from{ opacity:0; transform:translateX(var(--dx)); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .guide-book .book-page{ animation:none !important; } }
+  .guide-nav{ position:sticky; bottom:0; z-index:5; display:flex; align-items:center; justify-content:center; gap:14px; padding:12px 8px calc(12px + env(safe-area-inset-bottom)); margin-top:8px; background:var(--paper); border-top:1px solid var(--line); }
+  .guide-nav button{ font:inherit; font-size:0.92rem; font-weight:700; min-width:92px; padding:10px 16px; border-radius:999px; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; }
+  .guide-nav button:hover:not(:disabled){ border-color:var(--green-strong); color:var(--green-deep); }
+  .guide-nav button:disabled{ opacity:.35; cursor:default; }
+  .guide-nav .guide-count{ min-width:84px; text-align:center; font-size:0.9rem; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  @media (min-width:860px){
+    .guide-book{ gap:0; }
+    .book-page, .book-slot{ width:auto; max-width:none; }
+    .book-slot{ display:block; }
+    .book-page img, .book-slot{ height:clamp(420px, calc(100vh - 124px), 900px); width:auto; aspect-ratio:720/1480; }
+    .book-slot{ visibility:hidden; }
+    .book-page:first-child img{ border-radius:6px 0 0 6px; }
+    .book-page:last-child img{ border-radius:0 6px 6px 0; }
+    .guide-book.single .book-page img{ border-radius:6px; }
+  }
 
   /* a11y + stats */
   .skip-link{ position:absolute; left:-999px; top:8px; }
@@ -294,8 +316,12 @@
       <p>니트생활자 · 2024.11</p>
     </div>
     <div class="guide-parts" id="guideParts"></div>
-    <div class="guide-pages" id="guidePages"></div>
-    <div class="guide-parts" id="guidePartsBottom"></div>
+    <div class="guide-book" id="guideBook" aria-live="polite"></div>
+    <div class="guide-nav">
+      <button type="button" id="guidePrev">‹ 이전</button>
+      <span class="guide-count" id="guideCount"></span>
+      <button type="button" id="guideNext">다음 ›</button>
+    </div>
   </main>
 
   <main id="view-detail" class="view" hidden>
@@ -566,25 +592,94 @@ A4. 전에 제가 숙면 관련된 책을 읽었을 때 오전 3시가 되면 �
   var viewGuide = document.getElementById("view-guide");
   var GUIDE_ALT = ["표지 · 어깨를 빌리고 싶을지도...", "왜 청년들은", "지난 몇 년간 경제 활동이 없는 ‘쉬었음’ 청년과 ‘고립’청년", "Part 1. 알아가기", "단절, 고립 되었다고 느끼는 이유", "청년들이 고립되는 과정", "3. 긴 무업 기간으로 인한 불안감", "4. 낮아진 자존감, 극단적인 생각", "5. 스트레스로 인한 고립감, 자책", "고립될 때 느끼는 감정", "고립감 해소에 가장 중요한 것", "말하지 못한 마음", "2. 말하지 못한 속마음", "3. 헌신, 배려, 고맙다는 말", "경험과 위로를 주는 사람들", "가족의 어깨", "“이렇게 말해주세요”", "“이렇게 함께 해주세요”", "친구의 어깨", "“이렇게 함께 해주세요”", "공감과 이해", "동료의 어깨", "“이렇게 말해주세요”", "“이렇게 함께 해주세요”", "소속감과 공동 목표", "다양한 사회 활동 참여", "낯선 사람의 어깨", "“이렇게 함께 해주세요”", "사회적 관계의 대안", "고립감 해소를 위한 지원들", "상담 지원", "광역 및 기초 지역 단위 정신건강복지센터", "지자체 및 정부지원", "중앙청년 지원센터", "청년재단 - 청년 다다름 사업", "커뮤니티 활동 및 일상", "펭귄의 날갯짓", "푸른고래 리커버리센터", "주변인 ( 가족,형제 등 ) 지원", "중앙청년 지원센터", "가이드를 마치며", "2. 자책하지 않기", "3. 자신을 믿고, 남들과 비교하지않기", "4. 인생의 조언", "고립의 상태에 있을 때는 주변 사람들과의 관계들도 무척", "마지막 쪽 · 작성 정보"];
   var GUIDE_PARTS = [["표지",1],["Part 1 알아가기",5],["Part 2 공감하기",11],["Part 3 어깨를 내어주기",16],["Part 4 연결하기",31],["가이드를 마치며",41]];
+  var GUIDE_N = GUIDE_ALT.length;
+  var guideCur = 1;
+  var guideMQ = window.matchMedia("(min-width: 860px)");
   var guideBuilt = false;
+  function guidePad(i){ return (i < 10 ? "0" : "") + i; }
+  function guidePagesFor(p){
+    if (!guideMQ.matches) return [p];
+    if (p <= 1) return [1];
+    var a = (p % 2 === 0) ? p : p - 1;
+    return (a + 1 <= GUIDE_N) ? [a, a + 1] : [a];
+  }
+  function guidePageHtml(i, eager){
+    return '<figure class="book-page"><img src="guide/p' + guidePad(i) + '.webp" alt="' + i + "쪽 · " + GUIDE_ALT[i-1] + '" width="720" height="1480"' + (eager ? "" : "") + "></figure>";
+  }
+  function guidePreload(p){
+    if (p < 1 || p > GUIDE_N) return;
+    guidePagesFor(p).forEach(function(i){ var im = new Image(); im.src = "guide/p" + guidePad(i) + ".webp"; });
+  }
+  function guideRender(dir, updateUrl){
+    var pages = guidePagesFor(guideCur);
+    guideCur = pages[0];
+    var book = document.getElementById("guideBook");
+    var html = "";
+    var slot = '<div class="book-slot" aria-hidden="true"></div>';
+    if (guideMQ.matches && pages.length === 1){
+      html = (pages[0] === 1) ? slot + guidePageHtml(1) : guidePageHtml(pages[0]) + slot;
+    } else {
+      html = pages.map(function(i){ return guidePageHtml(i); }).join("");
+    }
+    book.className = "guide-book" + (guideMQ.matches && pages.length === 1 ? " single" : "") + (dir ? " flip-" + dir : "");
+    book.innerHTML = html;
+    var last = pages[pages.length - 1];
+    document.getElementById("guideCount").textContent = (pages.length > 1 ? pages[0] + "–" + last : pages[0]) + " / " + GUIDE_N;
+    document.getElementById("guidePrev").disabled = pages[0] <= 1;
+    document.getElementById("guideNext").disabled = last >= GUIDE_N;
+    Array.prototype.forEach.call(document.querySelectorAll("#guideParts button"), function(btn, idx){
+      var start = +btn.getAttribute("data-gp");
+      var next = GUIDE_PARTS[idx + 1] ? GUIDE_PARTS[idx + 1][1] : GUIDE_N + 1;
+      btn.classList.toggle("active", last >= start && last < next);
+    });
+    guidePreload(last + 1);
+    guidePreload(pages[0] - 1);
+    if (updateUrl){
+      var h = "#/guide/" + guideCur;
+      curHash = h;
+      try { history.replaceState(null, "", h); } catch(e){}
+    }
+  }
+  function guideShow(p, dir, updateUrl){
+    p = Math.max(1, Math.min(GUIDE_N, parseInt(p, 10) || 1));
+    guideCur = p;
+    guideRender(dir, updateUrl);
+    if (dir){
+      var bk = document.getElementById("guideBook");
+      bk.scrollIntoView({ block:"start" });
+    }
+  }
+  function guideNext(){
+    var pages = guidePagesFor(guideCur);
+    var last = pages[pages.length - 1];
+    if (last < GUIDE_N) guideShow(last + 1, "next", true);
+  }
+  function guidePrev(){
+    var first = guidePagesFor(guideCur)[0];
+    if (first > 1) guideShow(first - 1, "prev", true);
+  }
   function renderGuide(){
     if (guideBuilt) return;
     guideBuilt = true;
-    var chips = GUIDE_PARTS.map(function(p){
+    document.getElementById("guideParts").innerHTML = GUIDE_PARTS.map(function(p){
       return '<button type="button" data-gp="' + p[1] + '">' + p[0] + "</button>";
     }).join("");
-    document.getElementById("guideParts").innerHTML = chips;
-    document.getElementById("guidePartsBottom").innerHTML = chips;
-    var html = "";
-    for (var i = 1; i <= GUIDE_ALT.length; i++){
-      var n = (i < 10 ? "0" : "") + i;
-      html += '<figure class="guide-page" id="gp-' + i + '"><img src="guide/p' + n + '.webp" alt="' + i + "쪽 · " + GUIDE_ALT[i-1] + '" width="720" height="1480" loading="lazy"><figcaption>' + i + " / " + GUIDE_ALT.length + "</figcaption></figure>";
-    }
-    document.getElementById("guidePages").innerHTML = html;
-  }
-  function guideJump(n){
-    var t = document.getElementById("gp-" + n);
-    if (t) t.scrollIntoView({ behavior:"smooth", block:"start" });
+    document.getElementById("guidePrev").addEventListener("click", guidePrev);
+    document.getElementById("guideNext").addEventListener("click", guideNext);
+    var onMQ = function(){ if (!viewGuide.hidden) guideRender(null, false); };
+    if (guideMQ.addEventListener) guideMQ.addEventListener("change", onMQ); else if (guideMQ.addListener) guideMQ.addListener(onMQ);
+    var book = document.getElementById("guideBook"), sx = 0, sy = 0, st = 0;
+    book.addEventListener("touchstart", function(e){ var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; st = Date.now(); }, { passive:true });
+    book.addEventListener("touchend", function(e){
+      var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.6 && Date.now() - st < 700){ if (dx < 0) guideNext(); else guidePrev(); }
+    }, { passive:true });
+    document.addEventListener("keydown", function(e){
+      if (viewGuide.hidden) return;
+      var tag = (e.target && e.target.tagName) || "";
+      if (tag === "INPUT" || tag === "TEXTAREA" || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.key === "ArrowRight") guideNext(); else if (e.key === "ArrowLeft") guidePrev();
+    });
   }
   var searchInput = document.getElementById("searchInput");
   var searchForm = document.getElementById("searchForm");
@@ -723,7 +818,8 @@ A4. 전에 제가 숙면 관련된 책을 읽었을 때 오전 3시가 되면 �
       viewGuide.hidden = false;
       renderGuide();
       document.title = "어깨를 빌리고 싶어질 때면… · Neethow";
-      if (r.page > 1) setTimeout(function(){ guideJump(r.page); }, 60); else window.scrollTo(0,0);
+      guideShow(r.page || 1, null, false);
+      window.scrollTo(0,0);
       return;
     }
     if (r.view === "detail"){
@@ -765,13 +861,10 @@ A4. 전에 제가 숙면 관련된 책을 읽었을 때 오전 3시가 되면 �
     document.getElementById("catRibbon").scrollIntoView({ behavior:"smooth", block:"start" });
   });
   document.getElementById("navGuide").addEventListener("click", function(){ go("#/guide"); });
-  view_guide_clicks();
-  function view_guide_clicks(){
-    viewGuide.addEventListener("click", function(e){
-      var b = e.target.closest && e.target.closest("button[data-gp]");
-      if (b) guideJump(b.getAttribute("data-gp"));
-    });
-  }
+  viewGuide.addEventListener("click", function(e){
+    var bt = e.target.closest && e.target.closest("button[data-gp]");
+    if (bt) guideShow(bt.getAttribute("data-gp"), null, true);
+  });
   document.getElementById("navRandom").addEventListener("click", function(){
     var pick = STORIES[Math.floor(Math.random() * STORIES.length)];
     go("#/story/" + pick.id);

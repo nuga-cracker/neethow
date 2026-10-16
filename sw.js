@@ -1,6 +1,6 @@
 // 한 번 열어본 뒤에는 오프라인에서도 열리도록 캐시합니다.
 // index.html 내용을 고쳤다면 아래 VERSION 숫자를 올려주세요.
-var VERSION = "neethow-v10";
+var VERSION = "neethow-v11";
 var CORE = ["./", "index.html", "manifest.webmanifest", "favicon.svg", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", function(e){
