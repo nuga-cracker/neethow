@@ -12,7 +12,8 @@
 <meta property="og:site_name" content="Neethow">
 <meta property="og:title" content="Neethow · 우리가 함께 나누었던 고민들">
 <meta property="og:description" content="니트컴퍼니 서대문점 참가자들이 함께 나눈 고민과 답변을 담은 기록물">
-<meta property="og:image" content="og.png">
+<meta property="og:url" content="https://nuga-cracker.github.io/neethow/">
+<meta property="og:image" content="https://nuga-cracker.github.io/neethow/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -394,7 +395,9 @@ A1. 저도 고민자분과 비슷한 성향의 사람이지 않을까 싶어요.
       title:"오래된 습관 타파하고 기죽었을 때 기 펴는 법",
       question:`원래 가지고 있던 오래된 습관을 타파하는 법..? 기죽었을 때 기 펴는 법!`,
       answers:[
-        { type:"answer", gist:"장도연 마법의 주문 영상 보기", text:`기죽었을 때 유튜브에서 장도연 마법의 주문 영상 추천드려요😉` },
+        { type:"answer", gist:"장도연 마법의 주문 영상 보기", text:`기죽었을 때 유튜브에서 장도연 마법의 주문 영상 추천드려요😉
+
+https://www.youtube.com/shorts/-ZrlQ-QcoUI` },
         { type:"answer", gist:"어깨와 허리 펴기", text:`기 말고 어깨와 허리를 폅니다! 자세가 바르면 정신도 기도 사는 것 같아요!` },
         { type:"answer", gist:"습관 환경 설계하고 달리기", text:`Q2. 원래 가지고 있던 오래된 습관을 타파하는 법..? 기죽었을 때 기 펴는 법!
 
@@ -498,7 +501,8 @@ A4. 전에 제가 숙면 관련된 책을 읽었을 때 오전 3시가 되면 �
 
   function richText(s){
     return escapeHtml(s).replace(/(https?:\/\/[^\s<]+)/g, function(url){
-      return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + "</a>";
+      var link = '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + "</a>";
+      return link;
     });
   }
 
